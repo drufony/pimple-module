@@ -1,0 +1,51 @@
+<?php
+/**
+ * @file
+ * The Pimple module.
+ */
+
+/**
+ * Implements hook_hook_info().
+ */
+function pimple_hook_info() {
+  $hooks['pimple_info'] = array(
+    'group' => 'pimple',
+  );
+  $hooks['pimple_info_alter'] = array(
+    'group' => 'pimple',
+  );
+  return $hooks;
+}
+
+/**
+ * Function builds and returns the container requested.
+ *
+ * @param $name
+ *
+ * @return mixed
+ */
+function pimple_get_container($name) {
+  $containers = &drupal_static(__FUNCTION__, array());
+  if (!isset($containers[$name])) {
+
+    $info = module_invoke_all('pimple_info');
+    drupal_alter('pimple_info', $info);
+
+    if (isset($info[$name])) {
+
+      if (!empty($info[$name]['arguments']) && is_array($info[$name]['arguments'])) {
+        $reflect = new ReflectionClass($info[$name]['class']);
+        $containers[$name] = $reflect->newInstanceArgs($info[$name]['arguments']);
+      }
+      else {
+        $containers[$name]  = new $info[$name]['class']();
+      }
+
+      foreach ($info[$name]['calls'] as $call) {
+        call_user_func_array(array($containers[$name], $call[0]), $call[1]);
+      }
+    }
+  }
+
+  return $containers[$name];
+}
