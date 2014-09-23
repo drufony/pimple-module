@@ -45,6 +45,9 @@ function pimple_get_container($name) {
         call_user_func_array(array($containers[$name], $call[0]), $call[1]);
       }
     }
+    else {
+      return;
+    }
   }
 
   return $containers[$name];
