@@ -1,5 +1,5 @@
 {
-    "name": "bangpound/pimple-module",
+    "name": "drufony/pimple-module",
     "description": "Pimple container module for Drupal 7",
     "license": "MIT",
     "type": "drupal-project",
