@@ -18,7 +18,7 @@
 function hook_pimple_info() {
   $info = array();
   $info['my_container'] = array(
-    'class' => 'Pimple\Container',
+    'class' => 'Pimple\\Container',
     'arguments' => array(
       array(
         'name' => 'pimple'
@@ -46,5 +46,5 @@ function hook_pimple_info() {
  * @param $info
  */
 function hook_pimple_info_alter(&$info) {
-  $info['my_container']['class'] = 'Silex\Application';
+  $info['my_container']['class'] = 'Silex\\Application';
 }
