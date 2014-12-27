@@ -2,7 +2,7 @@
     "name": "drufony/pimple-module",
     "description": "Pimple container module for Drupal 7",
     "license": "MIT",
-    "type": "drupal-project",
+    "type": "drupal-module",
     "require": {
         "composer/installers": "~1.0",
         "pimple/pimple": ">2.1,<4"
