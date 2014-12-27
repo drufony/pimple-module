@@ -24,7 +24,7 @@ function pimple_hook_info() {
  *
  * @return mixed
  */
-function pimple_get_container($name) {
+function pimple_get_container($name = 'default') {
   $containers = &drupal_static(__FUNCTION__, array());
   if (!isset($containers[$name])) {
 
