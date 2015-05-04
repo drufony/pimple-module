@@ -39,7 +39,7 @@ function pimple_get_container($name = 'default') {
 
   // If the container doesn't exist, it's best to fail.
   if (!isset($containers[$name])) {
-    throw new RuntimeException('Pimple module found no definition for container "'. $name .'"');
+    throw new RuntimeException('Pimple module found no definition for container "' . $name . '"');
   }
 
   if (is_array($containers[$name])) {
