@@ -6,7 +6,8 @@
 function pimple_pimple_info() {
   return array(
     'default' => array(
-      'class' => 'Pimple\\Container',
+      'values' => array(),
+      'providers' => array(),
     ),
   );
 }

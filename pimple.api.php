@@ -9,9 +9,9 @@
  * constructor arguments and method calls required to configure
  * the container.
  *
- * Use `arguments` to pass default values to the container.
+ * Use `values` to pass default values to the container.
  *
- * Use `calls` to attach service providers as in the example.
+ * Use `providers` to attach service providers as in the example.
  *
  * @return array
  */
@@ -19,22 +19,17 @@ function hook_pimple_info() {
   $info = array();
   $info['my_container'] = array(
     'class' => 'Pimple\\Container',
-    'arguments' => array(
+    'values' => array(
+      'name' => 'pimple'
+    ),
+    'providers' => array(
       array(
-        'name' => 'pimple'
+        'class' => 'Pimple\\Tests\\Fixtures\\PimpleServiceProvider',
+        'values' => array(
+          'pimple' => 'pimple2'
+        ),
       ),
     ),
-    'calls' => array(
-      array(
-        'register',
-        array(
-          new \Pimple\Tests\Fixtures\PimpleServiceProvider(),
-          array(
-            'pimple' => 'pimple2'
-          )
-        )
-      )
-    )
   );
   return $info;
 }

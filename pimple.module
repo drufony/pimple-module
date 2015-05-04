@@ -25,30 +25,88 @@ function pimple_hook_info() {
  * @return mixed
  */
 function pimple_get_container($name = 'default') {
-  $containers = &drupal_static(__FUNCTION__, array());
-  if (!isset($containers[$name])) {
+  $containers = &drupal_static(__FUNCTION__, NULL);
 
+  // Either a definition or an actual container is stored here.
+  if (is_null($containers)) {
+    // Ordinary Drupal info hook.
     $info = module_invoke_all('pimple_info');
     drupal_alter('pimple_info', $info);
 
-    if (isset($info[$name])) {
+    // Object definitions with class, arguments, and method calls.
+    $containers = array_map('_pimple_get_definition', $info);
+  }
 
-      if (!empty($info[$name]['arguments']) && is_array($info[$name]['arguments'])) {
-        $reflect = new ReflectionClass($info[$name]['class']);
-        $containers[$name] = $reflect->newInstanceArgs($info[$name]['arguments']);
-      }
-      else {
-        $containers[$name]  = new $info[$name]['class']();
-      }
+  // If the container doesn't exist, it's best to fail.
+  if (!isset($containers[$name])) {
+    throw new RuntimeException('Pimple module found no definition for container "'. $name .'"');
+  }
 
-      foreach ($info[$name]['calls'] as $call) {
-        call_user_func_array(array($containers[$name], $call[0]), $call[1]);
-      }
-    }
-    else {
-      return;
-    }
+  if (is_array($containers[$name])) {
+    $definition = $containers[$name];
+    $containers[$name] = pimple_object_factory($definition['class'], $definition['arguments'], $definition['calls']);
   }
 
   return $containers[$name];
+}
+
+/**
+ * Convert Drupal module hook info into calls to pimple_object_factory().
+ *
+ * @param $info
+ * @return array
+ */
+function _pimple_get_definition($info) {
+
+  // Default object factory parameters for any container.
+  $defaults = array(
+    'class' => 'Pimple\\Container',
+    'arguments' => array(array()),
+    'calls' => array(),
+  );
+
+  // Merge defaults and keep only keys defined in defaults.
+  $definition = array_intersect_key(array_merge($defaults, $info), $defaults);
+
+  // Merge container values into first constructor argument.
+  if (isset($info['values'])) {
+    $definition['arguments'][0] = array_merge($definition['arguments'][0], $info['values']);
+  }
+
+  // Create calls for each provider and optional values.
+  if (isset($info['providers'])) {
+
+    // Convert provider info to object factory calls to container's register
+    // method.
+    $definition['calls'] = array_merge($definition['calls'], array_map(function ($info) {
+      $info = array_merge(array('values' => array()), $info);
+
+      return array(
+        'register',
+        array(pimple_object_factory($info['class']), $info['values']),
+      );
+    }, $info['providers']));
+  }
+
+  return $definition;
+}
+
+/**
+ * Create an object and call methods on it.
+ *
+ * @see \Symfony\Component\DependencyInjection\ContainerBuilder::createService
+ * @param $class
+ * @param array $arguments
+ * @param array $calls
+ * @return object
+ */
+function pimple_object_factory($class, array $arguments = array(), array $calls = array()) {
+  $r = new \ReflectionClass($class);
+  $object = $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+
+  foreach ($calls as $call) {
+    call_user_func_array(array($object, $call[0]), $call[1]);
+  }
+
+  return $object;
 }
