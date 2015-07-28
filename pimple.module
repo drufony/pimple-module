@@ -22,7 +22,7 @@ function pimple_hook_info() {
  *
  * @param $name
  *
- * @return mixed
+ * @return \Pimple\Container
  */
 function pimple_get_container($name = 'default') {
   $containers = &drupal_static(__FUNCTION__, NULL);
