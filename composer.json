@@ -4,7 +4,7 @@
     "license": "MIT",
     "type": "drupal-module",
     "require": {
-        "composer/installers": "~1.0",
+        "composer/installers": "^1.0|^2.0",
         "pimple/pimple": ">2.1,<4"
     },
     "extra": {
