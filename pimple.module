@@ -104,7 +104,7 @@ function _pimple_get_definition($info) {
  */
 function pimple_object_factory($class, array $arguments = [], array $calls = []) {
   $r = new ReflectionClass($class);
-  $object = $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+  $object = $r->getConstructor() ? $r->newInstanceArgs($arguments) : $r->newInstance();
 
   foreach ($calls as $call) {
     call_user_func_array([$object, $call[0]], $call[1]);
