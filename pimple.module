@@ -4,16 +4,18 @@
  * The Pimple module.
  */
 
+use Pimple\Container;
+
 /**
  * Implements hook_hook_info().
  */
 function pimple_hook_info() {
-  $hooks['pimple_info'] = array(
+  $hooks['pimple_info'] = [
     'group' => 'pimple',
-  );
-  $hooks['pimple_info_alter'] = array(
+  ];
+  $hooks['pimple_info_alter'] = [
     'group' => 'pimple',
-  );
+  ];
   return $hooks;
 }
 
@@ -22,7 +24,7 @@ function pimple_hook_info() {
  *
  * @param $name
  *
- * @return \Pimple\Container
+ * @return Container
  */
 function pimple_get_container($name = 'default') {
   $containers = &drupal_static(__FUNCTION__, NULL);
@@ -59,11 +61,11 @@ function pimple_get_container($name = 'default') {
 function _pimple_get_definition($info) {
 
   // Default object factory parameters for any container.
-  $defaults = array(
-    'class' => 'Pimple\\Container',
-    'arguments' => array(array()),
-    'calls' => array(),
-  );
+  $defaults = [
+    'class' => Container::class,
+    'arguments' => [[]],
+    'calls' => [],
+  ];
 
   // Merge defaults and keep only keys defined in defaults.
   $definition = array_intersect_key(array_merge($defaults, $info), $defaults);
@@ -79,12 +81,12 @@ function _pimple_get_definition($info) {
     // Convert provider info to object factory calls to container's register
     // method.
     $definition['calls'] = array_merge($definition['calls'], array_map(function ($info) {
-      $info = array_merge(array('values' => array()), $info);
+      $info = array_merge(['values' => []], $info);
 
-      return array(
+      return [
         'register',
-        array(pimple_object_factory($info['class']), $info['values']),
-      );
+        [pimple_object_factory($info['class']), $info['values']],
+      ];
     }, $info['providers']));
   }
 
@@ -100,12 +102,12 @@ function _pimple_get_definition($info) {
  * @param array $calls
  * @return object
  */
-function pimple_object_factory($class, array $arguments = array(), array $calls = array()) {
-  $r = new \ReflectionClass($class);
+function pimple_object_factory($class, array $arguments = [], array $calls = []) {
+  $r = new ReflectionClass($class);
   $object = $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
 
   foreach ($calls as $call) {
-    call_user_func_array(array($object, $call[0]), $call[1]);
+    call_user_func_array([$object, $call[0]], $call[1]);
   }
 
   return $object;
